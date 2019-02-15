@@ -15,6 +15,18 @@ import './assets/fonts/iconfont.css'
 import axios from 'axios'
 // 给axios做配置(访问根地址，Vue之$http成员)
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1'
+// 给axios配置“拦截器”，在其中绑定token
+axios.interceptors.request.use(
+  function(config) {
+    var token = window.sessionStorage.getItem('token')
+    config.headers.Authorization = token
+    return config
+  },
+  function(error) {
+    return Promise.reject(error)
+  }
+
+)
 Vue.prototype.$http = axios
 
 // 注册全部的element组件

@@ -33,8 +33,8 @@ export default {
     // loginForm: 收集登录表单的全部表单域信息
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       // 给登录表单域设置校验规则
       loginFormRules: {
