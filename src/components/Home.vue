@@ -1,50 +1,51 @@
 <template>
+  <el-container>
+    <el-header>
+      <div id="logo-box">
+        <img src="../assets/img/heima.png" alt="">
+        <span>电商后台管理系统</span>
+      </div>
+      <el-button type="info" @click="logout">退出</el-button>
+    </el-header>
     <el-container>
-        <el-header>
-            <div id="logo-box">
-                <img src="../assets/img/heima.png" alt="">
-                <span>电商后台管理系统</span>
-            </div>
-            <el-button type="info" @click="logout">退出</el-button>
-        </el-header>
-        <el-container>
-            <el-aside :width="menushow ? '65px' : '200px'">
-                <div
-                    style="height:25px;color:aliceblue;text-align:center;line-height:25px;
+      <el-aside :width="menushow ? '65px' : '200px'">
+        <div
+          style="height:25px;color:aliceblue;text-align:center;line-height:25px;
                 background-color:#495164;font-size:12px;letter-spacing:0.1em;cursor:pointer;
                 user-select:none;"
-                    @click="menushow = !menushow"
-                >|||</div>
-                <el-menu
-                    background-color="#353A45"
-                    text-color="#fff"
-                    active-text-color="#009FFF"
-                    :style="menushow?'width:65px;':'width:200px;'"
-                    :collapse="menushow"
-                    :collapse-transition="false"
-                    :unique-opened="true"
-                >
-                    <el-submenu :index="item.id+''" v-for="(item,k) in menuList" :key="item.id">
-                        <template slot="title">
-                            <i :class="'iconfont icon-' + menuicon[k]"></i>
-                            <span>{{item.authName}}</span>
-                        </template>
-                        <el-menu-item
-                            :index="item.id+'-'+item2.id"
-                            v-for="item2 in item.children"
-                            :key="item2.id"
-                        >
-                            <i class="el-icon-menu"></i>
-                            <span>{{item2.authName}}</span>
-                        </el-menu-item>
-                    </el-submenu>
-                </el-menu>
-            </el-aside>
-            <el-main>
-                <router-view/>
-            </el-main>
-        </el-container>
+          @click="menushow = !menushow"
+        >|||</div>
+        <el-menu
+          background-color="#353A45"
+          text-color="#fff"
+          active-text-color="#009FFF"
+          :collapse="menushow"
+          :collapse-transition="false"
+          :unique-opened="true"
+          :router="true"
+        >
+          <el-submenu
+            :index="item.id+''"
+            v-for="(item,k) in menuList"
+            :key="item.id"
+            :style="menushow?'width:65px;':'width:200px;'"
+          >
+            <template slot="title">
+              <i :class="'iconfont icon-' + menuicon[k]"></i>
+              <span>{{item.authName}}</span>
+            </template>
+            <el-menu-item :index="item2.path" v-for="item2 in item.children" :key="item2.id">
+              <i class="el-icon-menu"></i>
+              <span>{{item2.authName}}</span>
+            </el-menu-item>
+          </el-submenu>
+        </el-menu>
+      </el-aside>
+      <el-main>
+        <router-view/>
+      </el-main>
     </el-container>
+  </el-container>
 </template>
 
 <script>
