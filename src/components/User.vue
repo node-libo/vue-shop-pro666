@@ -69,19 +69,13 @@
         :total="queryParams.total"
       ></el-pagination>
       <!--添加用户的 Dialog 弹框区-->
-      <el-dialog
-        title="添加用户"
-        :visible.sync="addDialogVisible"
-        width="50%"
-        @close="addDialogClose"
-        center
-      >
+      <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="50%" @close="addDialogClose">
         <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="80px">
           <el-form-item label="用户名" prop="username">
             <el-input v-model="addForm.username" :clearable="true"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input v-model="addForm.password" :clearable="true"></el-input>
+            <el-input type="password" v-model="addForm.password" :clearable="true"></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="addForm.email" :clearable="true"></el-input>
@@ -96,7 +90,7 @@
         </span>
       </el-dialog>
       <!--修改用户的 Dialog 弹框区-->
-      <el-dialog title="添加用户" :visible.sync="editDialogVisible" width="50%" center>
+      <el-dialog title="修改用户" :visible.sync="editDialogVisible" width="50%" @close="editDialogClose">
         <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="80px">
           <el-form-item label="用户名" prop="username">
             <el-input v-model="editForm.username" :disabled="true"></el-input>
@@ -152,6 +146,11 @@ export default {
       // 根据变化后的 页码 重新获得数据
       this.getUserInfos()
     },
+    // 修改用户重置
+    editDialogClose() {
+      // 重置form表单
+      this.$refs.editFormRef.resetFields()
+    },
 
     // 添加用户重置
     addDialogClose() {
@@ -189,23 +188,29 @@ export default {
     },
     // 修改用户
     // 接收信息入库存储
-    async editUser() {
+    editUser() {
       // axios 提交数据存储
-      // 用户id 已经被存储赋给 editForm.id 成员里边了
-      const { data: res } = await this.$http.put(
-        'users/' + this.editForm.id,
-        this.editForm
-      )
-      console.log(res)
-      if (res.meta.status !== 200) {
-        return this.$message.error(res.meta.msg)
-      }
-      // 修改成功后，关闭 Dialog弹框
-      this.editDialogVisible = false
-      // 提示成功信息
-      this.$message.success(res.meta.msg)
-      // 调用函数把新添加的用户刷新出来
-      this.getUserInfos()
+      // 进行客户端 form 表单校验
+      this.$refs.editFormRef.validate(async valid => {
+        // 校验成功的处理
+        if (valid) {
+          // 用户id 已经被存储赋给 editForm.id 成员里边了
+          const { data: res } = await this.$http.put(
+            'users/' + this.editForm.id,
+            this.editForm
+          )
+          console.log(res)
+          if (res.meta.status !== 200) {
+            return this.$message.error(res.meta.msg)
+          }
+          // 修改成功后，关闭 Dialog弹框
+          this.editDialogVisible = false
+          // 提示成功信息
+          this.$message.success(res.meta.msg)
+          // 调用函数把新添加的用户刷新出来
+          this.getUserInfos()
+        }
+      })
     },
     // 删除用户
     delUser(id) {
@@ -220,8 +225,14 @@ export default {
           if (res.meta.status !== 200) {
             return this.$message.error(res.meta.msg)
           }
-          // 删除成功，提示 和 更新数据
+          // 删除成功提示
           this.$message.success(res.meta.msg)
+          // 判断数据删除之前，当前页码只有一条数据
+          if(this.userInfos.length===1 && this.queryParams.pagenum>1){
+            // 使得页码减1操作
+            this.queryParams.pagenum--
+          }
+          // 更新数据2
           this.getUserInfos()
         })
         .catch(() => {})
